@@ -40,8 +40,9 @@ export default class Publisher extends WebRTCBase {
         );
       });
     }
+      
+      this.externalStream = opts.stream;
 
-    this.constraints = opts.constraints;
     this.onWebsocketClose = opts.onWebsocketClose;
   }
 
@@ -115,6 +116,8 @@ export default class Publisher extends WebRTCBase {
   };
 
   clearLocalStreamSource = () => {
+    return;
+
     if (this.stream) {
       this.stream.getTracks().forEach(function(track) {
         track.stop();
@@ -171,6 +174,16 @@ export default class Publisher extends WebRTCBase {
    */
   getMedia = (opts, cb) => {
     //this.clearLocalStreamSource();
+    
+    if (typeof cb === 'function') {
+        cb(() => {
+            this.gotMedia(this.externalStream);
+        });
+    } else {
+        this.gotMedia(this.externalStream);
+    }
+    return;
+
     navigator.mediaDevices
       .getUserMedia(this.constraints)
       .then(stream => {
